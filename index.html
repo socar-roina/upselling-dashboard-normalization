@@ -213,7 +213,7 @@ pre.sql .cmt { color:#7dd3fc; }
       <li>바텀시트는 예약 1건당 1종만 노출.</li>
       <li>시간연장과 차종 업셀링이 우선 노출되는 예약(특히 각 ABT 실험 기간)에서는 PF0가 빠져 모수 작아짐.</li>
       <li>현재 구간(5/21~6/8)은 시간연장 노출이 일 100건 이하로만 겹쳐, 노출/예약 비율이 73.7%로 높게 나옴.</li>
-      <li>차종 업그레이드 ABT가 시작되면 해당 대상 예약은 PF0 대신 차종이 노출되어 모수 더 줄어듦.</li>
+      <li>차종 업그레이드가 6/10 배포되어, 차종이 우선 노출되는 예약만큼 앞으로 PF0 모수가 더 줄어들 수 있음(데이터 적재 후 확인).</li>
     </ul>
   </div>
 
@@ -311,7 +311,7 @@ pre.sql .cmt { color:#7dd3fc; }
   <div class="section-label">다른 업셀링 종류 현황 <span class="tag tag-gray">바텀시트 통합 운영</span></div>
   <div class="alert-info">
     바텀시트는 보험(PF), 대여요금(시간연장), 차종 업그레이드 3종을 한 화면에 통합.<br>
-    <strong>현재 프로덕션에 떠 있는 건 PF 보험 넛지 1종</strong>이며, 나머지 2종은 아래 상태.
+    <strong>PF 보험 넛지 상시 운영, 차종 업그레이드 6/10 오전 배포</strong>, 대여요금(시간연장)은 정규화 대기. 각 상태는 아래 참고.
   </div>
   <div class="status-row">
     <div class="status-card">
@@ -327,12 +327,12 @@ pre.sql .cmt { color:#7dd3fc; }
     </div>
     <div class="status-card">
       <div class="status-head">
-        <span class="status-badge status-prep">준비 중</span>
+        <span class="status-badge status-live">배포됨 (6/10 오전)</span>
         <strong style="font-size:13px;color:#111827">차종 업그레이드</strong>
       </div>
       <div style="font-size:12px;color:#4b5563;line-height:1.7">
-        현재 QA, 배포 진행 단계로 프로덕션 노출 전.<br>
-        배포되면 본 대시보드에 노출/수락 지표 추가 예정.
+        6/10 오전 프로덕션 배포.<br>
+        노출/수락 데이터는 이벤트 로그 D+1 적재라 6/11부터 집계 가능, 적재되면 본 대시보드에 지표 추가 예정.
       </div>
     </div>
   </div>
