@@ -108,6 +108,9 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Pretendard', 'S
 .method-item strong { color:#111827; }
 pre.sql { background:#0f172a; color:#e2e8f0; border-radius:8px; padding:13px 15px; font-family: ui-monospace, Menlo, monospace; font-size:11px; line-height:1.6; overflow-x:auto; margin-top:8px; white-space:pre; }
 pre.sql .cmt { color:#7dd3fc; }
+.sql-details { margin-top:8px; }
+.sql-details summary { cursor:pointer; font-size:12px; font-weight:700; color:#2563eb; padding:6px 0; }
+.sql-details summary:hover { color:#1e40af; }
 .alert-info { background:#fffbeb; border-left:4px solid #f59e0b; padding:11px 15px; border-radius:0 8px 8px 0; margin-bottom:14px; font-size:12px; color:#92400e; line-height:1.6; }
 </style>
 </head>
@@ -226,6 +229,20 @@ pre.sql .cmt { color:#7dd3fc; }
     </div>
   </div>
 
+  <!-- PF0 생성 비중 (사업 기준) -->
+  <div class="section-label">PF0 생성 비중 <span class="tag tag-blue">사업 기준</span> <span class="tag tag-gray">정규화 이후 (5/21 14:00 ~ 6/8)</span></div>
+  <div class="card">
+    <h3>전체 예약의 보험등급 선택 비율</h3>
+    <div class="card-sub">사업에서 PF0를 보는 기준(전체 예약 중 PF0/30/70 선택 비율). 위 넛지 수락률(7.2%)과 다른 축. 전체 183,602건 기준</div>
+    <div class="mrow"><span class="k">PF0 (자기부담금 0원)</span><span class="v">29.7%</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:29.7%;background:#16a34a"></div></div>
+    <div class="mrow" style="margin-top:10px"><span class="k">PF30 (자기부담금 30만원)</span><span class="v">24.5%</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:24.5%;background:#60a5fa"></div></div>
+    <div class="mrow" style="margin-top:10px"><span class="k">PF70 (자기부담금 70만원)</span><span class="v">45.3%</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:45.3%;background:#cbd5e1"></div></div>
+    <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.55">PF0 요금 50% 인하(5/11~)와 결제 전 넛지가 함께 작용한 결과. 사업 자료의 "투입 전후 +8%p" 등은 4/29 ABT 실험 전후 기준 수치라 본 대시보드(정규화 이후 기준)와 시점이 다름.</div>
+  </div>
+
   <!-- ③ DAILY TREND -->
   <div class="section-label">일별 추이 <span class="tag tag-blue">노출 횟수 (막대)</span> <span class="tag tag-ok">수락률 (선)</span></div>
   <div class="card">
@@ -332,6 +349,7 @@ pre.sql .cmt { color:#7dd3fc; }
     <div class="method-item">• <strong>최근 1~2일</strong>: 결제 데이터 D+1 반영으로 수락(전환)이 일부 과소집계 가능.</div>
     <div class="method-item">• <strong>바텀시트 클릭(<code>pf0_option</code>) 미사용 사유</strong>: 클릭 UU가 노출 UU의 약 97%로(기본 선택/렌더 시 발화) 실제 수락으로 보기 어려워, 결제 결과 기준으로 집계.</div>
 
+    <details class="sql-details"><summary>쿼리 펼쳐보기 (일별 노출 / PF0 수락)</summary>
     <pre class="sql"><span class="cmt">-- 일별 노출 / PF0 수락 (정규화 배포 후)</span>
 WITH v AS (
   SELECT DISTINCT DATE(event_at_kst) AS d, member_id,
@@ -351,7 +369,7 @@ SELECT v.d,
   COUNT(DISTINCT v.member_id) AS exposed_uu,
   COUNT(DISTINCT IF(r.member_id IS NOT NULL, v.member_id, NULL)) AS accepted_pf0_uu
 FROM v LEFT JOIN r ON v.d=r.d AND v.member_id=r.member_id
-GROUP BY 1 ORDER BY 1;</pre>
+GROUP BY 1 ORDER BY 1;</pre></details>
   </div>
 
 </div>
@@ -367,6 +385,25 @@ const rate = labels.map((_, i) =>
 );
 
 const colBlue = '#3b82f6', colGreen = '#16a34a';
+
+// 6/1 데이터 적재 이슈 표시 (점선 + 라벨)
+const issueMarker = {
+  id: 'issueMarker',
+  afterDraw(chart) {
+    const idx = chart.data.labels.indexOf('6/1');
+    if (idx < 0) return;
+    const {ctx, chartArea:{top,bottom}, scales:{x}} = chart;
+    const xp = x.getPixelForTick(idx);
+    ctx.save();
+    ctx.setLineDash([3,3]); ctx.strokeStyle = 'rgba(220,38,38,0.55)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(xp, top); ctx.lineTo(xp, bottom); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(185,28,28,0.95)'; ctx.font = '700 9px -apple-system,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('6/1 데이터 적재 이슈', xp, top + 10);
+    ctx.restore();
+  }
+};
+Chart.register(issueMarker);
 
 new Chart(document.getElementById('trendChart'), {
   data: {
