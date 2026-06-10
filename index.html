@@ -108,9 +108,13 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Pretendard', 'S
 .method-item strong { color:#111827; }
 pre.sql { background:#0f172a; color:#e2e8f0; border-radius:8px; padding:13px 15px; font-family: ui-monospace, Menlo, monospace; font-size:11px; line-height:1.6; overflow-x:auto; margin-top:8px; white-space:pre; }
 pre.sql .cmt { color:#7dd3fc; }
-.sql-details { margin-top:8px; }
-.sql-details summary { cursor:pointer; font-size:12px; font-weight:700; color:#2563eb; padding:6px 0; }
-.sql-details summary:hover { color:#1e40af; }
+.method-details { margin-top:26px; }
+.method-summary { cursor:pointer; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.06em; padding:10px 16px; background:#f3f4f6; border-radius:8px; display:inline-block; list-style:none; }
+.method-summary::-webkit-details-marker { display:none; }
+.method-summary::before { content:'＋ '; color:#9ca3af; font-weight:700; }
+.method-details[open] .method-summary::before { content:'－ '; }
+.method-summary:hover { background:#e5e7eb; color:#374151; }
+.method-details[open] .method-summary { margin-bottom:14px; }
 .alert-info { background:#fffbeb; border-left:4px solid #f59e0b; padding:11px 15px; border-radius:0 8px 8px 0; margin-bottom:14px; font-size:12px; color:#92400e; line-height:1.6; }
 </style>
 </head>
@@ -324,7 +328,8 @@ pre.sql .cmt { color:#7dd3fc; }
   </div>
 
   <!-- ⑦ METHOD / QUERY -->
-  <div class="section-label">집계 기준, 데이터 출처, 쿼리</div>
+  <details class="method-details">
+  <summary class="method-summary">집계 기준, 데이터 출처, 쿼리 펼쳐보기</summary>
   <div class="method">
     <h3>정의</h3>
     <div class="method-item">• <strong>예약</strong>: 정규화 후 전체 생성 예약 건수 (<code>profit_socar_reservation</code>, <code>created_at_kst</code> 2026-05-21 14:00 ~ 6/8). 183,602건 = 퍼널 모수.</div>
@@ -349,7 +354,7 @@ pre.sql .cmt { color:#7dd3fc; }
     <div class="method-item">• <strong>최근 1~2일</strong>: 결제 데이터 D+1 반영으로 수락(전환)이 일부 과소집계 가능.</div>
     <div class="method-item">• <strong>바텀시트 클릭(<code>pf0_option</code>) 미사용 사유</strong>: 클릭 UU가 노출 UU의 약 97%로(기본 선택/렌더 시 발화) 실제 수락으로 보기 어려워, 결제 결과 기준으로 집계.</div>
 
-    <details class="sql-details"><summary>쿼리 펼쳐보기 (일별 노출 / PF0 수락)</summary>
+    <h3 style="margin-top:16px">쿼리 (일별 노출 / PF0 수락)</h3>
     <pre class="sql"><span class="cmt">-- 일별 노출 / PF0 수락 (정규화 배포 후)</span>
 WITH v AS (
   SELECT DISTINCT DATE(event_at_kst) AS d, member_id,
@@ -369,8 +374,9 @@ SELECT v.d,
   COUNT(DISTINCT v.member_id) AS exposed_uu,
   COUNT(DISTINCT IF(r.member_id IS NOT NULL, v.member_id, NULL)) AS accepted_pf0_uu
 FROM v LEFT JOIN r ON v.d=r.d AND v.member_id=r.member_id
-GROUP BY 1 ORDER BY 1;</pre></details>
+GROUP BY 1 ORDER BY 1;</pre>
   </div>
+  </details>
 
 </div>
 
