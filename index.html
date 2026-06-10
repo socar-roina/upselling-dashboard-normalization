@@ -170,30 +170,30 @@ pre.sql .cmt { color:#7dd3fc; }
 
   <!-- ② FUNNEL -->
   <div class="card">
-    <h3>노출에서 수락까지 흐름</h3>
-    <div class="card-sub">정규화 배포 후 누적 (5/21 14:00 ~ 6/8), 결제 직전 바텀시트 기준</div>
+    <h3>예약에서 수락까지 단계별 흐름</h3>
+    <div class="card-sub">정규화 배포 후 누적 (5/21 14:00 ~ 6/8), 전체 예약 기준</div>
     <div class="pipe-flow">
       <div class="pipe-step">
         <div class="pipe-box">
-          <div class="pipe-lbl">노출 고객</div>
-          <div class="pipe-num">88,871명</div>
-          <div class="pipe-sub2">PF0 추천 본 고객 (중복 제거)</div>
+          <div class="pipe-lbl">① 예약</div>
+          <div class="pipe-num">183,602건</div>
+          <div class="pipe-sub2">정규화 후 전체 예약 (모수)</div>
         </div>
       </div>
       <div class="pipe-arrow">→</div>
       <div class="pipe-step">
         <div class="pipe-box">
-          <div class="pipe-lbl">노출 횟수</div>
+          <div class="pipe-lbl">② 노출</div>
           <div class="pipe-num">135,260회</div>
-          <div class="pipe-sub2">예약 시도마다 1회</div>
+          <div class="pipe-sub2">PF0 추천 노출, 예약의 73.7%<br>PF30/70 고객에게 표시</div>
         </div>
       </div>
       <div class="pipe-arrow">→</div>
       <div class="pipe-step result">
         <div class="pipe-box">
-          <div class="pipe-lbl">PF0 수락</div>
-          <div class="pipe-num">7,935건 (5.9%)</div>
-          <div class="pipe-sub2">실제 PF0 결제 전환, 보험매출 약 1.21억원</div>
+          <div class="pipe-lbl">③ 수락</div>
+          <div class="pipe-num">7,935건</div>
+          <div class="pipe-sub2">실제 PF0 전환, 노출의 5.9% (전체 예약의 4.3%)<br>보험매출 약 1.21억원</div>
         </div>
       </div>
     </div>
@@ -283,6 +283,7 @@ pre.sql .cmt { color:#7dd3fc; }
   <div class="section-label">집계 기준, 데이터 출처, 쿼리</div>
   <div class="method">
     <h3>정의</h3>
+    <div class="method-item">• <strong>예약</strong>: 정규화 후 전체 생성 예약 건수 (<code>profit_socar_reservation</code>, <code>created_at_kst</code> 2026-05-21 14:00 ~ 6/8). 183,602건 = 퍼널 모수.</div>
     <div class="method-item">• <strong>노출 고객 / 노출 횟수</strong>: 앱 이벤트 로그에서 <code>page_name='upsell_bottomsheet'</code>, <code>event_name='view'</code>, <code>upselling_type=pfNudge</code> 인 이벤트. 고객 수 = 고유 <code>member_id</code>, 노출 횟수 = (날짜 × 고객) 단위.</div>
     <div class="method-item">• <strong>수락(PF0 전환)</strong>: 노출된 고객이 <strong>같은 날 실제로 PF0(<code>pf_type='0'</code>) 예약을 생성</strong>한 경우. 단순 바텀시트 클릭이 아니라 결제 결과 기준.</div>
     <div class="method-item">• <strong>수락률</strong> = 수락(전환) ÷ 노출 횟수.</div>
