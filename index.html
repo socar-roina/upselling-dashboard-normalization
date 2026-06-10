@@ -145,8 +145,8 @@ pre.sql .cmt { color:#7dd3fc; }
 <div class="main">
 
   <div class="intro">
-    PF 보험 넛지(자기부담금 0원 보험 추천)가 정규화 배포(5/21 14:00) 이후 <strong>몇 명에게 노출됐고, 그중 몇 %가 실제 PF0로 결제했는지</strong> 보는 대시보드입니다.<br>
-    노출은 앱 이벤트 로그 기준, 수락은 실제 PF0 결제 전환 기준입니다 (단순 클릭 아님).
+    PF 보험 넛지(자기부담금 0원 보험 추천)가 정규화 배포(5/21 14:00) 이후 <strong>몇 명에게 노출됐고, 그중 몇 %가 실제 PF0로 결제했는지</strong> 보는 대시보드.<br>
+    노출은 앱 이벤트 로그 기준, 수락은 실제 PF0 결제 전환 기준 (단순 클릭 아님).
   </div>
 
   <!-- ① KPI HERO -->
@@ -208,12 +208,12 @@ pre.sql .cmt { color:#7dd3fc; }
 
   <!-- 모수 주의 -->
   <div class="alert-info" style="margin-bottom:14px">
-    <strong>PF0 노출 모수는 전체 예약이 아닙니다.</strong>
+    <strong>PF0 노출 모수는 전체 예약이 아님.</strong>
     <ul style="margin:8px 0 0 18px;padding:0;line-height:1.75">
-      <li>바텀시트는 예약 1건당 1종만 노출됩니다.</li>
-      <li>시간연장과 차종 업셀링이 우선 노출되는 예약(특히 각 ABT 실험 기간)에서는 PF0가 빠져 모수가 작아집니다.</li>
-      <li>현재 구간(5/21~6/8)은 시간연장 노출이 일 100건 이하로만 겹쳐, 노출/예약 비율이 73.7%로 높게 나왔습니다.</li>
-      <li>차종 업그레이드 ABT가 시작되면 해당 대상 예약은 PF0 대신 차종이 노출되어 모수가 더 줄어듭니다.</li>
+      <li>바텀시트는 예약 1건당 1종만 노출.</li>
+      <li>시간연장과 차종 업셀링이 우선 노출되는 예약(특히 각 ABT 실험 기간)에서는 PF0가 빠져 모수 작아짐.</li>
+      <li>현재 구간(5/21~6/8)은 시간연장 노출이 일 100건 이하로만 겹쳐, 노출/예약 비율이 73.7%로 높게 나옴.</li>
+      <li>차종 업그레이드 ABT가 시작되면 해당 대상 예약은 PF0 대신 차종이 노출되어 모수 더 줄어듦.</li>
     </ul>
   </div>
 
@@ -234,7 +234,7 @@ pre.sql .cmt { color:#7dd3fc; }
     <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.55">
       직접 = 노출 후 바텀시트 하단 결제하기(cta_button)를 누르고 PF0로 결제한 건<br>
       간접 = 바텀시트를 닫았지만 이어진 결제 페이지에서 PF0를 직접 고른 건<br>
-      대부분(92.7%)이 바텀시트에서 바로 전환됩니다.
+      대부분(92.7%)이 바텀시트에서 바로 전환.
     </div>
   </div>
 
@@ -250,8 +250,8 @@ pre.sql .cmt { color:#7dd3fc; }
     <div class="mrow" style="margin-top:10px"><span class="k">PF70 (자기부담금 70만원)</span><span class="v">45.3%</span></div>
     <div class="bar-track"><div class="bar-fill" style="width:45.3%;background:#cbd5e1"></div></div>
     <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.6">
-      PF0 요금 50% 인하(5/11~)와 결제 전 넛지가 함께 작용한 결과입니다.<br>
-      사업 자료의 "투입 전후 +8%p" 등은 4/29 ABT 실험 전후 기준이라, 본 대시보드(정규화 이후 기준)와 시점이 다릅니다.
+      PF0 요금 50% 인하(5/11~)와 결제 전 넛지가 함께 작용한 결과.<br>
+      사업 자료의 "투입 전후 +8%p" 등은 4/29 ABT 실험 전후 기준이라, 본 대시보드(정규화 이후 기준)와 시점 다름.
     </div>
   </div>
 
@@ -265,9 +265,9 @@ pre.sql .cmt { color:#7dd3fc; }
       <span class="chart-interpret-icon">💡</span>
       <div style="display:flex;flex-direction:column;gap:5px">
         <div>막대 = 그날 PF0 추천이 뜬 횟수, 선 = 그중 실제 PF0로 결제한 비율.</div>
-        <div><span class="ci-good">수락률은 정규화 내내 5~7%대로 안정적입니다.</span></div>
-        <div>노출은 일 7,000~8,800회 수준입니다.</div>
-        <div>최근 1~2일(6/7~6/8) 수락률이 낮아 보이는 건 결제 데이터 D+1 반영 지연 영향일 수 있습니다.</div>
+        <div><span class="ci-good">수락률은 정규화 내내 대체로 5~7%대로 안정적.</span></div>
+        <div>노출은 일 7,000~8,800회 수준.</div>
+        <div>최근 1~2일(6/7~6/8) 수락률이 낮아 보이는 건 결제 데이터 D+1 반영 지연 영향 가능.</div>
       </div>
     </div>
   </div>
@@ -294,7 +294,7 @@ pre.sql .cmt { color:#7dd3fc; }
         <span class="v">약 38%</span>
       </div>
       <div class="bar-track"><div class="bar-fill" style="width:38%;background:#60a5fa"></div></div>
-      <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.6">이미 PF0인 고객에게는 넛지가 뜨지 않습니다.<br>따라서 노출 고객은 전부 ‘PF0로 올릴 여지가 있는’ 고객입니다.</div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.6">이미 PF0인 고객에게는 넛지가 뜨지 않음.<br>따라서 노출 고객은 전부 ‘PF0로 올릴 여지가 있는’ 고객.</div>
     </div>
     <div class="card" style="margin-bottom:0">
       <h3>수락 1건의 가치</h3>
@@ -303,15 +303,15 @@ pre.sql .cmt { color:#7dd3fc; }
       <div class="mrow"><span class="k">전환 1건당 평균 보험매출</span><span class="v">약 15,200원</span></div>
       <div class="mrow"><span class="k">참고: PF0 건당 평균 보험매출</span><span class="v">14,276원</span></div>
       <div class="mrow"><span class="k">참고: PF30 건당 평균 보험매출</span><span class="v">4,394원</span></div>
-      <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.6">순증분(전환 전 대비 추가 매출)은 위 총액보다 작습니다.<br>대조군이 없는 정규화 단계라, 순증분 추정은 별도 분석이 필요합니다.</div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.6">순증분(전환 전 대비 추가 매출)은 위 총액보다 작음.<br>대조군이 없는 정규화 단계라 순증분 추정은 별도 분석 필요.</div>
     </div>
   </div>
 
   <!-- ⑥ OTHER UPSELLING STATUS -->
   <div class="section-label">다른 업셀링 종류 현황 <span class="tag tag-gray">바텀시트 통합 운영</span></div>
   <div class="alert-info">
-    바텀시트는 보험(PF), 대여요금(시간연장), 차종 업그레이드 3종을 한 화면에 통합합니다.<br>
-    <strong>현재 프로덕션에 떠 있는 건 PF 보험 넛지 1종</strong>이며, 나머지 2종은 아래 상태입니다.
+    바텀시트는 보험(PF), 대여요금(시간연장), 차종 업그레이드 3종을 한 화면에 통합.<br>
+    <strong>현재 프로덕션에 떠 있는 건 PF 보험 넛지 1종</strong>이며, 나머지 2종은 아래 상태.
   </div>
   <div class="status-row">
     <div class="status-card">
@@ -320,9 +320,9 @@ pre.sql .cmt { color:#7dd3fc; }
         <strong style="font-size:13px;color:#111827">대여요금 (시간연장)</strong>
       </div>
       <div style="font-size:12px;color:#4b5563;line-height:1.7">
-        시간연장 ABT는 5/13~6/2 운영 후 종료됐습니다.<br>
-        <strong style="color:#92400e">6/3부터 프로덕션 노출 0건</strong>입니다 (정규화 미배포).<br>
-        실험 기간 노출은 소량(일 view 30~130건, 연장 선택 클릭 14~50건)이었고, 당일출발과 길이 조건이 좁아 모수가 작았습니다.
+        시간연장 ABT는 5/13~6/2 운영 후 종료.<br>
+        <strong style="color:#92400e">6/3부터 프로덕션 노출 0건</strong> (정규화 미배포).<br>
+        실험 기간 노출은 소량(일 view 30~130건, 연장 선택 클릭 14~50건), 당일출발과 길이 조건이 좁아 모수 작음.
       </div>
       <div style="font-size:11px;color:#9ca3af;margin-top:10px">실험 결과는 ‘대여시간연장 실험 결과 공유’(6/9) 및 시간연장 전용 대시보드 참고.</div>
     </div>
@@ -332,9 +332,9 @@ pre.sql .cmt { color:#7dd3fc; }
         <strong style="font-size:13px;color:#111827">차종 업그레이드</strong>
       </div>
       <div style="font-size:12px;color:#4b5563;line-height:1.7">
-        프로덕션 노출 <strong>0건</strong>입니다 (이벤트 로그상 <code style="background:#f3f4f6;border-radius:4px;padding:1px 4px;font-size:11px">car_upgrade_option</code> 클릭 없음).<br>
-        현재 QA와 배포 진행 단계입니다.<br>
-        배포되면 본 대시보드에 노출/수락 지표를 추가할 예정입니다.
+        프로덕션 노출 <strong>0건</strong> (이벤트 로그상 <code style="background:#f3f4f6;border-radius:4px;padding:1px 4px;font-size:11px">car_upgrade_option</code> 클릭 없음).<br>
+        현재 QA, 배포 진행 단계.<br>
+        배포되면 본 대시보드에 노출/수락 지표 추가 예정.
       </div>
     </div>
   </div>
@@ -375,12 +375,15 @@ WITH v AS (
   WHERE page_name='upsell_bottomsheet' AND event_name='view'
     AND REGEXP_EXTRACT(form_data, r'upselling_type[\\:]+([A-Za-z]+)')='pfNudge'
     AND event_at_kst >= DATETIME '2026-05-21 14:00:00'
+    AND event_at_kst <  DATETIME '2026-06-09 00:00:00'   <span class="cmt">-- 6/8까지 스냅샷</span>
     AND member_id IS NOT NULL
 ),
 r AS (
   SELECT DISTINCT DATE(created_at_kst) AS d, member_id
   FROM `socar-data.socar_biz_profit.profit_socar_reservation`
-  WHERE pf_type='0' AND created_at_kst >= DATETIME '2026-05-21 14:00:00'
+  WHERE pf_type='0'
+    AND created_at_kst >= DATETIME '2026-05-21 14:00:00'
+    AND created_at_kst <  DATETIME '2026-06-09 00:00:00'
 )
 SELECT v.d,
   COUNT(DISTINCT v.member_id) AS exposed_uu,
