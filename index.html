@@ -124,7 +124,7 @@ pre.sql .cmt { color:#7dd3fc; }
 <div class="top-bar">
   <div>
     <h1>업셀링 정규화 모니터링 (PF 보험 넛지)</h1>
-    <div class="meta">결제 직전 바텀시트에서 자기부담금 0원 보험(PF0)을 추천, 원래 PF70/PF30이던 고객에게만 노출 (정규화 전체 배포 후 실측)</div>
+    <div class="meta">결제 직전 추천 화면에서 자기부담금 0원 보험(PF0)을 추천, 원래 PF70/PF30이던 고객에게만 노출 (정규화 전체 배포 후 실측)</div>
   </div>
   <div class="updated">데이터 기준: 2026-05-21 14:00 ~ 2026-06-08 (KST)<br>이벤트(노출) ~6/8 완전, 결제(수락) ~6/9 (D+1 반영)</div>
 </div>
@@ -170,8 +170,8 @@ pre.sql .cmt { color:#7dd3fc; }
     <div class="kpi-card accent">
       <div class="kpi-top">🎯 수락률</div>
       <div class="kpi-num">7.2<span class="kpi-unit">%</span></div>
-      <div class="kpi-sub">실제 예약한 노출자 기준 PF0 전환율<br>노출 전체 기준으로는 5.9% (노출자의 18.5%는 그날 예약을 안 해 분모에 포함)</div>
-      <div class="kpi-pill">과거 실험 노출자 7% 전환과 정합</div>
+      <div class="kpi-sub">실제 예약까지 한 노출 고객 기준 PF0 전환율<br>노출 전체로 보면 5.9% (노출 고객의 18.5%는 그날 예약을 안 함)</div>
+      <div class="kpi-pill">과거 실험(노출자 7% 전환)과 비슷한 수준</div>
     </div>
   </div>
 
@@ -184,7 +184,7 @@ pre.sql .cmt { color:#7dd3fc; }
         <div class="pipe-box">
           <div class="pipe-lbl">① 예약</div>
           <div class="pipe-num">183,602건</div>
-          <div class="pipe-sub2">정규화 후 전체 예약 (모수)</div>
+          <div class="pipe-sub2">정규화 후 전체 예약</div>
         </div>
       </div>
       <div class="pipe-arrow">→</div>
@@ -192,7 +192,7 @@ pre.sql .cmt { color:#7dd3fc; }
         <div class="pipe-box">
           <div class="pipe-lbl">② 노출</div>
           <div class="pipe-num">135,260회</div>
-          <div class="pipe-sub2">PF0 추천 노출, 예약의 73.7%<br>PF30/70 고객에게 표시</div>
+          <div class="pipe-sub2">PF0 추천이 뜬 예약, 전체의 73.7%<br>이미 PF0거나 다른 추천이 뜬 예약은 제외</div>
         </div>
       </div>
       <div class="pipe-arrow">→</div>
@@ -208,33 +208,33 @@ pre.sql .cmt { color:#7dd3fc; }
 
   <!-- 모수 주의 -->
   <div class="alert-info" style="margin-bottom:14px">
-    <strong>PF0 노출 모수는 전체 예약이 아님.</strong>
+    <strong>예약보다 노출이 적은 이유</strong> (① 예약 183,602건 가운데 ② 노출 135,260건)
     <ul style="margin:8px 0 0 18px;padding:0;line-height:1.75">
-      <li>바텀시트는 예약 1건당 1종만 노출.</li>
-      <li>시간연장과 차종 업셀링이 우선 노출되는 예약(특히 각 ABT 실험 기간)에서는 PF0가 빠져 모수 작아짐.</li>
-      <li>현재 구간(5/21~6/8)은 시간연장 노출이 일 100건 이하로만 겹쳐, 노출/예약 비율이 73.7%로 높게 나옴.</li>
-      <li>차종 업그레이드가 6/10 배포되어, 차종이 우선 노출되는 예약만큼 앞으로 PF0 모수가 더 줄어들 수 있음(데이터 적재 후 확인).</li>
+      <li>결제 직전 추천 화면에는 추천이 한 번에 한 종류만 표시됨.</li>
+      <li>이미 PF0인 고객, 또는 시간연장과 차종 추천이 먼저 뜬 예약에는 PF0 추천이 안 뜸.</li>
+      <li>그래서 전체 예약의 73.7%에만 PF0 추천이 노출됨.</li>
+      <li>차종 업그레이드가 6/10 배포되어, 앞으로 PF0 추천이 뜨는 비율은 더 낮아질 수 있음.</li>
     </ul>
   </div>
 
   <!-- 직접/간접 -->
   <div class="card">
     <h3>수락 경로: 직접 vs 간접</h3>
-    <div class="card-sub">PF0 수락 7,935건을, 바텀시트에서 바로 수락(직접)과 바텀시트를 닫고 결제 페이지에서 PF0를 고른 경우(간접)로 분리</div>
+    <div class="card-sub">PF0 수락 7,935건을, 추천 화면에서 바로 수락(직접)과 추천 화면을 닫고 결제 페이지에서 PF0를 고른 경우(간접)로 구분</div>
     <div class="mrow">
-      <span class="k">직접 (바텀시트에서 결제하기로 PF0 수락)</span>
+      <span class="k">직접 (추천 화면에서 결제하기로 PF0 수락)</span>
       <span class="v">7,357건 <span style="color:#16a34a;margin-left:4px">92.7%</span></span>
     </div>
     <div class="bar-track"><div class="bar-fill" style="width:92.7%;background:#16a34a"></div></div>
     <div class="mrow" style="margin-top:12px">
-      <span class="k">간접 (바텀시트 닫고 결제 페이지에서 PF0 선택)</span>
+      <span class="k">간접 (추천 화면 닫고 결제 페이지에서 PF0 선택)</span>
       <span class="v">578건 <span style="color:#16a34a;margin-left:4px">7.3%</span></span>
     </div>
     <div class="bar-track"><div class="bar-fill" style="width:7.3%;background:#86efac"></div></div>
     <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.55">
-      직접 = 노출 후 바텀시트 하단 결제하기(cta_button)를 누르고 PF0로 결제한 건<br>
-      간접 = 바텀시트를 닫았지만 이어진 결제 페이지에서 PF0를 직접 고른 건<br>
-      대부분(92.7%)이 바텀시트에서 바로 전환.
+      직접 = 추천 화면의 결제하기 버튼을 누르고 PF0로 결제한 건<br>
+      간접 = 추천 화면을 닫았지만 이어진 결제 페이지에서 PF0를 직접 고른 건<br>
+      대부분(92.7%)이 추천 화면에서 바로 전환.
     </div>
   </div>
 
@@ -242,7 +242,7 @@ pre.sql .cmt { color:#7dd3fc; }
   <div class="section-label">PF0 생성 비중 <span class="tag tag-blue">사업 기준</span> <span class="tag tag-gray">정규화 이후 (5/21 14:00 ~ 6/8)</span></div>
   <div class="card">
     <h3>전체 예약의 보험등급 선택 비율</h3>
-    <div class="card-sub">사업에서 PF0를 보는 기준(전체 예약 중 PF0/30/70 선택 비율). 위 넛지 수락률(7.2%)과 다른 축. 전체 183,602건 기준</div>
+    <div class="card-sub">사업에서 PF0를 보는 기준(전체 예약 중 PF0/30/70 선택 비율). 위 PF0 수락률(7.2%)과는 다른 지표. 전체 183,602건 기준</div>
     <div class="mrow"><span class="k">PF0 (자기부담금 0원)</span><span class="v">29.7%</span></div>
     <div class="bar-track"><div class="bar-fill" style="width:29.7%;background:#16a34a"></div></div>
     <div class="mrow" style="margin-top:10px"><span class="k">PF30 (자기부담금 30만원)</span><span class="v">24.5%</span></div>
@@ -308,9 +308,9 @@ pre.sql .cmt { color:#7dd3fc; }
   </div>
 
   <!-- ⑥ OTHER UPSELLING STATUS -->
-  <div class="section-label">다른 업셀링 종류 현황 <span class="tag tag-gray">바텀시트 통합 운영</span></div>
+  <div class="section-label">다른 업셀링 종류 현황 <span class="tag tag-gray">추천 화면 통합</span></div>
   <div class="alert-info">
-    바텀시트는 보험(PF), 대여요금(시간연장), 차종 업그레이드 3종을 한 화면에 통합.<br>
+    PF(보험), 대여요금(시간연장), 차종 업그레이드 추천은 결제 직전 한 화면에서 함께 노출.<br>
     <strong>PF 보험 넛지 상시 운영, 차종 업그레이드 6/10 오전 배포</strong>, 대여요금(시간연장)은 정규화 대기. 각 상태는 아래 참고.
   </div>
   <div class="status-row">
@@ -348,7 +348,7 @@ pre.sql .cmt { color:#7dd3fc; }
     <div class="method-item">• <strong>수락률</strong> = 수락(전환) ÷ 노출 횟수 = 5.9%. 노출자 중 그날 실제 예약 완료(110,198건, 81.5%)만 분모로 보면 <strong>7.2%</strong>(=실제 예약자 기준). 노출 전체 중 18.5%는 바텀시트만 보고 미예약이라 수락 기회 없음.</div>
     <div class="method-item">• 참고: 전체 예약 중 PF0 선택 비율은 29.7%(이미 PF0인 고객 포함)로, 위 수락률(넛지가 PF70/30을 PF0로 전환한 비율)과 다른 지표.</div>
     <div class="method-item">• <strong>직접/간접</strong>: 수락 건 중 바텀시트 하단 결제하기(<code>cta_button</code>)를 누르고 PF0로 결제하면 직접, cta 클릭 없이(바텀시트 닫음) 결제 페이지에서 PF0를 고르면 간접. 직접 7,357건(92.7%), 간접 578건(7.3%).</div>
-    <div class="method-item">• <strong>노출 모수</strong>: 바텀시트는 예약 1건당 1종(upselling_type)만 노출. 시간연장/차종이 우선 노출되는 예약(특히 각 ABT 기간)은 PF0 노출에서 제외되어 모수가 줄어듦.</div>
+    <div class="method-item">• <strong>노출 대상</strong>: 결제 직전 추천은 예약 1건당 한 종류만 노출. 이미 PF0거나 시간연장/차종 추천이 먼저 뜬 예약은 PF0 노출에서 제외(전체 예약의 73.7%만 PF0 추천 노출).</div>
     <div class="method-item">• <strong>노출 시점 보험</strong>: 이벤트 <code>form_data</code>의 <code>pf_original</code> (70=PF70, 30=PF30). PF0 넛지는 PF70/PF30 고객에게만 발화.</div>
 
     <h3 style="margin-top:16px">데이터 출처 (BigQuery)</h3>
