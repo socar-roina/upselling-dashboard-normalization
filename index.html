@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>업셀링 정규화 모니터링 (PF 보험 넛지)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', sans-serif; background: #f7f8fa; color: #111827; font-size: 14px; line-height: 1.5; min-width: 1100px; }
+
+/* ─── TOP BAR ─── */
+.top-bar { background: white; color: #111827; border-bottom: 1px solid #e5e7eb; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; }
+.top-bar h1 { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+.top-bar .meta { font-size: 11px; color: #9ca3af; margin-top: 3px; }
+.top-bar .updated { font-size: 11px; color: #9ca3af; text-align: right; line-height: 1.6; }
+
+/* ─── TIMELINE ─── */
+.timeline-bar { background: white; border-bottom: 1px solid #e5e7eb; padding: 12px 28px; }
+.timeline-label { position: relative; height: 18px; font-size: 11px; color: #6b7280; margin-bottom: 5px; }
+.timeline-track { height: 7px; background: #e5e7eb; border-radius: 99px; position: relative; overflow: hidden; }
+.timeline-fill { position: absolute; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg,#3b82f6 0%,#2563eb 100%); border-radius: 99px; }
+.timeline-legend { display: flex; gap: 16px; margin-top: 7px; font-size: 11px; color: #6b7280; flex-wrap: wrap; }
+.legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+/* ─── LAYOUT (full width, no wasted side margin) ─── */
+.main { width: 100%; margin: 0 auto; padding: 18px 28px 48px; }
+
+/* ─── SECTION LABEL ─── */
+.section-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; margin: 26px 0 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tag { font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600; text-transform: none; letter-spacing: 0; }
+.tag-ok { background: #d1fae5; color: #065f46; }
+.tag-blue { background: #dbeafe; color: #1e40af; }
+.tag-gray { background: #f3f4f6; color: #6b7280; }
+.tag-warn { background: #fef3c7; color: #92400e; }
+
+/* ─── PLAIN INTRO ─── */
+.intro { background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 0 10px 10px 0; padding: 13px 18px; font-size: 13px; color: #1e3a5f; line-height: 1.65; margin-bottom: 4px; }
+.intro strong { color: #1e40af; }
+
+/* ─── KPI HERO (다미 요청 핵심) ─── */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+.kpi-card { background: white; border-radius: 14px; border: 1px solid #e5e7eb; padding: 20px 22px; position: relative; overflow: hidden; }
+.kpi-card.accent { background: linear-gradient(135deg,#1e293b 0%,#0f2040 100%); border-color: transparent; }
+.kpi-top { font-size: 11px; font-weight: 700; color: #9ca3af; letter-spacing: 0.02em; margin-bottom: 10px; display:flex; align-items:center; gap:6px; }
+.kpi-card.accent .kpi-top { color: rgba(255,255,255,0.5); }
+.kpi-num { font-size: 40px; font-weight: 900; line-height: 1; letter-spacing: -0.03em; color: #111827; }
+.kpi-card.accent .kpi-num { color: #fff; }
+.kpi-unit { font-size: 16px; font-weight: 700; color: #6b7280; margin-left: 3px; }
+.kpi-card.accent .kpi-unit { color: rgba(255,255,255,0.6); }
+.kpi-sub { font-size: 12px; color: #9ca3af; margin-top: 9px; line-height: 1.5; }
+.kpi-card.accent .kpi-sub { color: rgba(255,255,255,0.6); }
+.kpi-pill { display:inline-block; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 20px; background:#dcfce7; color:#166534; margin-top:8px; }
+
+/* ─── CARD SHELL ─── */
+.card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 18px 22px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04); }
+.card h3 { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 3px; }
+.card-sub { font-size: 11px; color: #9ca3af; margin-bottom: 14px; line-height: 1.5; }
+.kpi-card, .intro { box-shadow: 0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04); }
+
+/* ─── FUNNEL ─── */
+.pipe-flow { display: flex; align-items: stretch; gap: 0; }
+.pipe-step { flex: 1; }
+.pipe-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; height: 100%; }
+.pipe-step.result .pipe-box { background: linear-gradient(135deg,#059669 0%,#047857 100%); border-color: transparent; }
+.pipe-lbl { font-size: 10px; color: #9ca3af; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+.pipe-step.result .pipe-lbl { color: rgba(255,255,255,0.6); }
+.pipe-num { font-size: 24px; font-weight: 900; color: #111827; line-height: 1; }
+.pipe-step.result .pipe-num { color: #fff; }
+.pipe-sub2 { font-size: 11px; color: #6b7280; margin-top: 5px; line-height: 1.4; }
+.pipe-step.result .pipe-sub2 { color: rgba(255,255,255,0.7); }
+.pipe-arrow { display: flex; align-items: center; padding: 0 12px; color: #d1d5db; font-size: 20px; align-self: center; }
+
+/* ─── CHART ─── */
+.chart-wrap { height: 280px; position: relative; }
+.chart-interpret { display: flex; gap: 8px; align-items: flex-start; background: #f8fafc; border-top: 1px solid #f0f0f0; margin-top: 14px; padding: 11px 13px; border-radius: 0 0 8px 8px; font-size: 12px; color: #374151; line-height: 1.55; }
+.chart-interpret-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.chart-interpret em { font-style: normal; font-weight: 700; color: #111827; }
+.ci-good { color: #059669; font-weight: 700; }
+
+/* ─── SPLIT TWO COL ─── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+/* ─── MINI STAT ROWS ─── */
+.mrow { display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:8px 0; border-bottom:1px solid #f3f4f6; }
+.mrow:last-child { border-bottom:none; }
+.mrow .k { color:#6b7280; }
+.mrow .v { font-weight:700; color:#111827; }
+.bar-track { height: 8px; background:#f3f4f6; border-radius:99px; overflow:hidden; margin-top:6px; }
+.bar-fill { height:100%; border-radius:99px; }
+
+/* ─── STATUS CARDS ─── */
+.status-row { display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px; }
+.status-card { background:white; border-radius:12px; border:1px solid #e5e7eb; padding:16px 20px; box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04); }
+.status-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.status-badge { font-size:11px; font-weight:800; padding:3px 9px; border-radius:20px; }
+.status-pending { background:#fef3c7; color:#92400e; }
+.status-prep { background:#f3f4f6; color:#6b7280; }
+.status-live { background:#dcfce7; color:#166534; }
+
+/* ─── FOOTNOTE / METHOD ─── */
+.method { background:#fbfbfc; border:1px solid #eef0f3; border-radius:12px; padding:18px 22px; margin-top:8px; }
+.method h3 { font-size:12px; font-weight:800; color:#374151; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.05em; }
+.method-item { font-size:11.5px; color:#4b5563; line-height:1.7; margin-bottom:6px; }
+.method-item code { background:#f3f4f6; border-radius:4px; padding:1px 5px; font-family: ui-monospace, Menlo, monospace; font-size:11px; color:#374151; }
+.method-item strong { color:#111827; }
+pre.sql { background:#0f172a; color:#e2e8f0; border-radius:8px; padding:13px 15px; font-family: ui-monospace, Menlo, monospace; font-size:11px; line-height:1.6; overflow-x:auto; margin-top:8px; white-space:pre; }
+pre.sql .cmt { color:#7dd3fc; }
+.alert-info { background:#fffbeb; border-left:4px solid #f59e0b; padding:11px 15px; border-radius:0 8px 8px 0; margin-bottom:14px; font-size:12px; color:#92400e; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<div class="top-bar">
+  <div>
+    <h1>업셀링 정규화 모니터링 (PF 보험 넛지)</h1>
+    <div class="meta">결제 직전 바텀시트에서 자기부담금 0원 보험(PF0)을 추천, 원래 PF70/PF30이던 고객에게만 노출 (정규화 전체 배포 후 실측)</div>
+  </div>
+  <div class="updated">데이터 기준: 2026-05-21 14:00 ~ 2026-06-08 (KST)<br>이벤트(노출) ~6/8 완전, 결제(수락) ~6/9 (D+1 반영)</div>
+</div>
+
+<!-- ─── TIMELINE ─── -->
+<div class="timeline-bar">
+  <div class="timeline-label">
+    <span style="position:absolute;left:0">시간연장 ABT 5/13</span>
+    <span style="position:absolute;left:28%;transform:translateX(-50%);color:#2563eb;font-weight:700">정규화 배포 5/21 14:00</span>
+    <span style="position:absolute;left:62%;transform:translateX(-50%)">시간연장 노출 종료 6/3</span>
+    <span style="position:absolute;right:0">현재 6/8</span>
+  </div>
+  <div class="timeline-track"><div class="timeline-fill" style="left:28%;width:72%"></div></div>
+  <div class="timeline-legend">
+    <span><span class="legend-dot" style="background:#2563eb"></span>PF 보험 넛지: 5/21 14:00 정규화(ABT 66%에서 전체 100% 노출로 전환), 현재까지 운영</span>
+    <span><span class="legend-dot" style="background:#f59e0b"></span>대여요금(시간연장): 6/3부터 노출 0건 (실험 종료, 정규화 대기)</span>
+    <span><span class="legend-dot" style="background:#d1d5db"></span>차종 업그레이드: 프로덕션 노출 전 (QA, 배포 중)</span>
+  </div>
+</div>
+
+<!-- ─── MAIN ─── -->
+<div class="main">
+
+  <div class="intro">
+    다미님 요청 지표입니다. <strong>“PF 보험 넛지가 몇 명에게 떴고, 그중 몇 %가 PF0를 수락했는지”</strong>를 정규화 배포(5/21 14:00) 이후 실데이터로 집계했습니다.
+    노출은 앱 이벤트 로그, 수락은 실제 PF0 결제 전환으로 봤습니다(단순 클릭이 아니라 실제 결제 기준).
+  </div>
+
+  <!-- ① KPI HERO -->
+  <div class="section-label" style="margin-top:18px">핵심 지표 <span class="tag tag-blue">정규화 후 누적 5/21 14:00 ~ 6/8</span> <span class="tag tag-ok">BQ 실측</span></div>
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-top">👥 노출 고객 수</div>
+      <div class="kpi-num">88,871<span class="kpi-unit">명</span></div>
+      <div class="kpi-sub">PF0 추천을 한 번 이상 본 고객 (중복 제거)<br>원래 PF70/PF30이던 고객</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-top">📲 노출 횟수</div>
+      <div class="kpi-num">135,260<span class="kpi-unit">회</span></div>
+      <div class="kpi-sub">예약 시도(결제 직전)마다 1회 집계<br>일평균 약 7,500회</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-top">✅ PF0 수락(전환)</div>
+      <div class="kpi-num">7,935<span class="kpi-unit">건</span></div>
+      <div class="kpi-sub">노출 후 실제로 PF0로 결제한 건<br>전환 보험매출 합계 약 1.21억원</div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-top">🎯 수락률</div>
+      <div class="kpi-num">5.9<span class="kpi-unit">%</span></div>
+      <div class="kpi-sub">노출 횟수 대비 PF0 전환 비율</div>
+      <div class="kpi-pill">과거 실험 ‘노출자 7% 전환’과 정합</div>
+    </div>
+  </div>
+
+  <!-- ② FUNNEL -->
+  <div class="card">
+    <h3>노출에서 수락까지 흐름</h3>
+    <div class="card-sub">정규화 배포 후 누적 (5/21 14:00 ~ 6/8), 결제 직전 바텀시트 기준</div>
+    <div class="pipe-flow">
+      <div class="pipe-step">
+        <div class="pipe-box">
+          <div class="pipe-lbl">노출 고객</div>
+          <div class="pipe-num">88,871명</div>
+          <div class="pipe-sub2">PF0 추천 본 고객 (중복 제거)</div>
+        </div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-box">
+          <div class="pipe-lbl">노출 횟수</div>
+          <div class="pipe-num">135,260회</div>
+          <div class="pipe-sub2">예약 시도마다 1회</div>
+        </div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step result">
+        <div class="pipe-box">
+          <div class="pipe-lbl">PF0 수락</div>
+          <div class="pipe-num">7,935건 (5.9%)</div>
+          <div class="pipe-sub2">실제 PF0 결제 전환, 보험매출 약 1.21억원</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ DAILY TREND -->
+  <div class="section-label">일별 추이 <span class="tag tag-blue">노출 횟수 (막대)</span> <span class="tag tag-ok">수락률 (선)</span></div>
+  <div class="card">
+    <h3>PF 보험 넛지 일별 노출과 수락률</h3>
+    <div class="card-sub">5/21은 14:00 배포 후 반나절만 집계, 6/1은 이벤트 로그 적재 누락(노출 169건만 기록, 예약량은 정상)으로 추세에서 제외</div>
+    <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+    <div class="chart-interpret">
+      <span class="chart-interpret-icon">💡</span>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div>막대 = 그날 PF0 추천이 뜬 횟수, 선 = 그중 실제 PF0로 결제한 비율.</div>
+        <div><span class="ci-good">수락률은 정규화 내내 5~7%대로 안정적.</span> 노출은 일 7,000~8,800회 수준.</div>
+        <div>최근 1~2일(6/7~6/8) 수락률이 낮아 보이는 건 결제 데이터 D+1 반영 지연 영향 가능.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ DAILY ACCEPT COUNT -->
+  <div class="card">
+    <h3>일별 PF0 수락(전환) 건수</h3>
+    <div class="card-sub">노출 후 실제 PF0로 결제한 건수 (일 기준)</div>
+    <div class="chart-wrap" style="height:220px"><canvas id="acceptChart"></canvas></div>
+  </div>
+
+  <!-- ⑤ WHO SEES IT -->
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0">
+      <h3>누가 보나 (노출 고객의 원래 보험)</h3>
+      <div class="card-sub">PF0 넛지는 자기부담금이 남아있는 고객(PF70/PF30)에게만 노출, 일평균 기준</div>
+      <div class="mrow">
+        <span class="k">PF70 (자기부담금 70만원)에서 노출</span>
+        <span class="v">약 62%</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:62%;background:#3b82f6"></div></div>
+      <div class="mrow" style="margin-top:10px">
+        <span class="k">PF30 (자기부담금 30만원)에서 노출</span>
+        <span class="v">약 38%</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:38%;background:#60a5fa"></div></div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.55">이미 PF0인 고객에게는 넛지가 뜨지 않음. 따라서 노출 고객은 전부 ‘PF0로 올릴 여지가 있는’ 고객.</div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <h3>수락 1건의 가치</h3>
+      <div class="card-sub">PF0 전환 시 발생하는 보험 매출 (전환 전 PF30/70 보험료 차감 전 총액)</div>
+      <div class="mrow"><span class="k">PF0 전환 보험매출 합계</span><span class="v">약 1.21억원</span></div>
+      <div class="mrow"><span class="k">전환 1건당 평균 보험매출</span><span class="v">약 15,200원</span></div>
+      <div class="mrow"><span class="k">참고: PF0 건당 평균 보험매출</span><span class="v">14,276원</span></div>
+      <div class="mrow"><span class="k">참고: PF30 건당 평균 보험매출</span><span class="v">4,394원</span></div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.55">순증분(전환 전 대비 추가 매출)은 위 총액보다 작음. 대조군이 없는 정규화 단계라 순증분 추정은 별도 분석 필요.</div>
+    </div>
+  </div>
+
+  <!-- ⑥ OTHER UPSELLING STATUS -->
+  <div class="section-label">다른 업셀링 종류 현황 <span class="tag tag-gray">바텀시트 통합 운영</span></div>
+  <div class="alert-info">
+    바텀시트는 보험(PF), 대여요금(시간연장), 차종 업그레이드 3종을 한 화면에 통합. <strong>현재 프로덕션에 떠 있는 건 PF 보험 넛지 1종</strong>이며, 나머지 2종은 아래 상태입니다.
+  </div>
+  <div class="status-row">
+    <div class="status-card">
+      <div class="status-head">
+        <span class="status-badge status-pending">실험 종료, 정규화 대기</span>
+        <strong style="font-size:13px;color:#111827">대여요금 (시간연장)</strong>
+      </div>
+      <div style="font-size:12px;color:#4b5563;line-height:1.65">
+        시간연장 ABT는 5/13~6/2 운영 후 종료. <strong style="color:#92400e">6/3부터 프로덕션 노출 0건</strong>(정규화 미배포).
+        실험 기간 노출은 소량(일 view 30~130건, 연장 선택 클릭 14~50건)으로, 당일출발과 길이 조건이 좁아 모수가 작았음.
+      </div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:10px">실험 결과는 ‘대여시간연장 실험 결과 공유’(6/9) 및 시간연장 전용 대시보드 참고.</div>
+    </div>
+    <div class="status-card">
+      <div class="status-head">
+        <span class="status-badge status-prep">준비 중</span>
+        <strong style="font-size:13px;color:#111827">차종 업그레이드</strong>
+      </div>
+      <div style="font-size:12px;color:#4b5563;line-height:1.65">
+        프로덕션 노출 <strong>0건</strong> (이벤트 로그상 <code style="background:#f3f4f6;border-radius:4px;padding:1px 4px;font-size:11px">car_upgrade_option</code> 클릭 없음). 현재 QA, 배포 진행 단계.
+        배포되면 본 대시보드에 노출/수락 지표 추가 예정.
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ METHOD / QUERY -->
+  <div class="section-label">집계 기준, 데이터 출처, 쿼리</div>
+  <div class="method">
+    <h3>정의</h3>
+    <div class="method-item">• <strong>노출 고객 / 노출 횟수</strong>: 앱 이벤트 로그에서 <code>page_name='upsell_bottomsheet'</code>, <code>event_name='view'</code>, <code>upselling_type=pfNudge</code> 인 이벤트. 고객 수 = 고유 <code>member_id</code>, 노출 횟수 = (날짜 × 고객) 단위.</div>
+    <div class="method-item">• <strong>수락(PF0 전환)</strong>: 노출된 고객이 <strong>같은 날 실제로 PF0(<code>pf_type='0'</code>) 예약을 생성</strong>한 경우. 단순 바텀시트 클릭이 아니라 결제 결과 기준.</div>
+    <div class="method-item">• <strong>수락률</strong> = 수락(전환) ÷ 노출 횟수.</div>
+    <div class="method-item">• <strong>노출 시점 보험</strong>: 이벤트 <code>form_data</code>의 <code>pf_original</code> (70=PF70, 30=PF30). PF0 넛지는 PF70/PF30 고객에게만 발화.</div>
+
+    <h3 style="margin-top:16px">데이터 출처 (BigQuery)</h3>
+    <div class="method-item">• 이벤트(노출, 클릭): <code>socar-data.app_web_log.socar_app_web_log</code> (Firebase에서 BQ로 적재, 약 D+1 반영)</div>
+    <div class="method-item">• 결제와 예약(PF0 전환, 보험매출): <code>socar-data.socar_biz_profit.profit_socar_reservation</code> (<code>pf_type</code>, <code>_rev_pf</code>, <code>created_at_kst</code>)</div>
+    <div class="method-item">• <code>form_data</code>는 정상 JSON이 아니라 <code>{pf_original:70,upselling_type:pfNudge}</code> 형식(이스케이프 혼재)이라 <code>JSON_VALUE</code> 불가, REGEXP로 추출.</div>
+
+    <h3 style="margin-top:16px">정규화 배포 시점 확인</h3>
+    <div class="method-item">• BQ 시간대별 집계상 5/21 13시 view 3건에서 <strong>14시 306건, 16시 977건</strong>으로 급증. ABT(66% 노출) 대비 일 노출이 약 1.5배(≈100/66)로 늘어 전체 100% 노출 전환 확인. 따라서 기준 시점은 <strong>2026-05-21 14:00 KST</strong>.</div>
+
+    <h3 style="margin-top:16px">주의</h3>
+    <div class="method-item">• <strong>6/1</strong>: 이벤트 로그 적재 누락(노출 169건만 기록, 예약량은 정상), 추세 해석에서 제외.</div>
+    <div class="method-item">• <strong>최근 1~2일</strong>: 결제 데이터 D+1 반영으로 수락(전환)이 일부 과소집계 가능.</div>
+    <div class="method-item">• <strong>바텀시트 클릭(<code>pf0_option</code>) 미사용 사유</strong>: 클릭 UU가 노출 UU의 약 97%로(기본 선택/렌더 시 발화) 실제 수락으로 보기 어려워, 결제 결과 기준으로 집계.</div>
+
+    <pre class="sql"><span class="cmt">-- 일별 노출 / PF0 수락 (정규화 배포 후)</span>
+WITH v AS (
+  SELECT DISTINCT DATE(event_at_kst) AS d, member_id,
+    REGEXP_EXTRACT(form_data, r'pf_original[\\:]+([0-9]+)') AS pf_original
+  FROM `socar-data.app_web_log.socar_app_web_log`
+  WHERE page_name='upsell_bottomsheet' AND event_name='view'
+    AND REGEXP_EXTRACT(form_data, r'upselling_type[\\:]+([A-Za-z]+)')='pfNudge'
+    AND event_at_kst >= DATETIME '2026-05-21 14:00:00'
+    AND member_id IS NOT NULL
+),
+r AS (
+  SELECT DISTINCT DATE(created_at_kst) AS d, member_id
+  FROM `socar-data.socar_biz_profit.profit_socar_reservation`
+  WHERE pf_type='0' AND created_at_kst >= DATETIME '2026-05-21 14:00:00'
+)
+SELECT v.d,
+  COUNT(DISTINCT v.member_id) AS exposed_uu,
+  COUNT(DISTINCT IF(r.member_id IS NOT NULL, v.member_id, NULL)) AS accepted_pf0_uu
+FROM v LEFT JOIN r ON v.d=r.d AND v.member_id=r.member_id
+GROUP BY 1 ORDER BY 1;</pre>
+  </div>
+
+</div>
+
+<script>
+// ─── DAILY DATA (BQ 실측, 5/21 14:00 ~ 6/8) ───
+// 6/1 = 이벤트 로그 적재 누락, null 처리(추세 제외)
+const labels   = ['5/21','5/22','5/23','5/24','5/25','5/26','5/27','5/28','5/29','5/30','5/31','6/1','6/2','6/3','6/4','6/5','6/6','6/7','6/8'];
+const exposed  = [5071, 7458, 6447, 5870, 7738, 8092, 7859, 8281, 7499, 7284, 7963, null, 7857, 8769, 8389, 7898, 7211, 7263, 8183];
+const accepted = [283,  534,  535,  467,  513,  459,  458,  482,  527,  486,  419,  null, 486,  461,  372,  427,  397,  306,  313 ];
+const rate = labels.map((_, i) =>
+  (exposed[i] && accepted[i] != null) ? +((accepted[i] / exposed[i] * 100).toFixed(1)) : null
+);
+
+const colBlue = '#3b82f6', colGreen = '#16a34a';
+
+new Chart(document.getElementById('trendChart'), {
+  data: {
+    labels,
+    datasets: [
+      { type:'bar', label:'노출 횟수', data: exposed, backgroundColor:'rgba(59,130,246,0.20)', borderColor:colBlue, borderWidth:1, yAxisID:'y', borderRadius:4, order:2 },
+      { type:'line', label:'수락률 (%)', data: rate, borderColor:colGreen, backgroundColor:'rgba(22,163,74,0.08)', pointBackgroundColor:colGreen, pointRadius:4, borderWidth:2.5, tension:0.35, yAxisID:'y1', order:1, spanGaps:true }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{ font:{size:11}, boxWidth:12, padding:12 } } },
+    scales:{
+      x:{ ticks:{font:{size:11}}, grid:{display:false} },
+      y:{ position:'left', beginAtZero:true, suggestedMax:10000, title:{display:true,text:'노출 횟수',font:{size:10},color:'#9ca3af'}, ticks:{font:{size:11}, callback:v=>v.toLocaleString()}, grid:{color:'#f3f4f6'} },
+      y1:{ position:'right', beginAtZero:true, suggestedMax:12, title:{display:true,text:'수락률 %',font:{size:10},color:'#16a34a'}, ticks:{font:{size:11}, callback:v=>v+'%'}, grid:{drawOnChartArea:false} }
+    }
+  }
+});
+
+new Chart(document.getElementById('acceptChart'), {
+  type:'bar',
+  data:{ labels, datasets:[
+    { label:'PF0 수락 건수', data: accepted, backgroundColor:'rgba(22,163,74,0.75)', borderColor:colGreen, borderWidth:0, borderRadius:4 }
+  ]},
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{ font:{size:11}, boxWidth:12, padding:10 } } },
+    scales:{
+      x:{ ticks:{font:{size:11}}, grid:{display:false} },
+      y:{ beginAtZero:true, ticks:{font:{size:11}}, grid:{color:'#f3f4f6'} }
+    }
+  }
+});
+</script>
+</body>
+</html>
