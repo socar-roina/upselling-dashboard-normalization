@@ -111,7 +111,7 @@ pre.sql .cmt { color:#7dd3fc; }
     <h1>업셀링 정규화 모니터링 (PF 보험 넛지)</h1>
     <div class="meta">결제 직전 추천 화면에서 자기부담금 0원 보험(PF0)을 추천, 원래 PF70/PF30이던 고객에게만 노출 (정규화 전체 배포 후 실측)</div>
   </div>
-  <div class="updated">데이터 기준 (KST)<br>노출 5/21 14:00 ~ 6/15 · 결제/수락 ~6/13 (결제 D+1~2 반영)</div>
+  <div class="updated">데이터 기준 (KST)<br>노출 5/21 14:00 ~ 6/15, 결제/수락 ~6/13 (결제 D+1~2 반영)</div>
 </div>
 
 <!-- ─── TIMELINE ─── -->
@@ -340,7 +340,7 @@ pre.sql .cmt { color:#7dd3fc; }
     <h3 style="margin-top:16px">데이터 출처 (BigQuery)</h3>
     <div class="method-item">• 이벤트(노출, 클릭): <code>socar-data.app_web_log.socar_app_web_log</code> (Firebase에서 BQ로 적재, 약 D+1 반영)</div>
     <div class="method-item">• 결제와 예약(PF0 전환, 보험매출): <code>socar-data.socar_biz_profit.profit_socar_reservation</code> (<code>pf_type</code>, <code>_rev_pf</code>, <code>created_at_kst</code>). 결제 데이터는 D+1~2 반영이라 누적 수치는 6/13까지로 집계.</div>
-    <div class="method-item">• <strong>form_data 포맷 변경</strong>: 6/10 차종 배포 때 단축됨. 이전 <code>{pf_original:70,upselling_type:pfNudge}</code> → 이후 <code>{pf:70,ut:p}</code> (pfNudge=p, carUpgradeUpselling=c). 정상 JSON이 아니라 REGEXP로 두 포맷 모두 추출.</div>
+    <div class="method-item">• <strong>form_data 포맷 변경</strong>: 6/10 차종 배포 때 단축됨. 이전 <code>{pf_original:70,upselling_type:pfNudge}</code>, 이후 <code>{pf:70,ut:p}</code> (pfNudge=p, carUpgradeUpselling=c). 정상 JSON이 아니라 REGEXP로 두 포맷 모두 추출.</div>
 
     <h3 style="margin-top:16px">정규화 배포 시점 확인</h3>
     <div class="method-item">• BQ 시간대별 집계상 5/21 13시 view 3건에서 <strong>14시 306건, 16시 977건</strong>으로 급증. 전체 100% 노출 전환 확인. 기준 시점 <strong>2026-05-21 14:00 KST</strong>.</div>
@@ -349,7 +349,7 @@ pre.sql .cmt { color:#7dd3fc; }
     <div class="method-item">• <strong>최근 2일(6/14~15)</strong>: 결제 데이터 D+1~2 반영으로 수락이 아직 과소집계. 노출(이벤트)은 6/15까지 완전.</div>
     <div class="method-item">• <strong>차종 수치</strong>: 노출/선택은 이벤트 로그 기준(6/10~6/15). 차종 결제 전환은 별도 집계 예정.</div>
 
-    <pre class="sql"><span class="cmt">-- 일별 노출 / PF0 수락 (정규화 배포 후, 구·신 form_data 통합)</span>
+    <pre class="sql"><span class="cmt">-- 일별 노출 / PF0 수락 (정규화 배포 후, 구버전/신버전 form_data 통합)</span>
 WITH v AS (
   SELECT DISTINCT DATE(event_at_kst) AS d, member_id
   FROM `socar-data.app_web_log.socar_app_web_log`
@@ -379,7 +379,7 @@ GROUP BY 1 ORDER BY 1;</pre>
 
 <script>
 // ─── DAILY DATA (BQ 실측) ───
-// 노출: 5/21~6/15 완전 / 수락: 6/13까지 안정, 6/14~15는 결제 D+1~2로 집계 중 → null
+// 노출: 5/21~6/15 완전 / 수락: 6/13까지 안정, 6/14~15는 결제 D+1~2로 집계 중이라 null
 const labels   = ['5/21','5/22','5/23','5/24','5/25','5/26','5/27','5/28','5/29','5/30','5/31','6/1','6/2','6/3','6/4','6/5','6/6','6/7','6/8','6/9','6/10','6/11','6/12','6/13','6/14','6/15'];
 const exposed  = [5071,7458,6447,5870,7738,8092,7859,8281,7499,7284,7965,8797,7860,8771,8389,7898,7213,7267,8269,7966,8515,8566,7454,7239,7911,8649];
 const accepted = [289, 542, 542, 472, 519, 470, 466, 495, 547, 499, 432, 463, 522, 482, 403, 474, 430, 354, 408, 371, 393, 355, 427, 388, null, null];
