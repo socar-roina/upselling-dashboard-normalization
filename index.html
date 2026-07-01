@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>업셀링 정규화 모니터링 (PF 보험 넛지)</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="data.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -112,14 +113,14 @@ pre.sql .cmt { color:#7dd3fc; }
     <h1>업셀링 정규화 모니터링 (PF 보험 넛지)</h1>
     <div class="meta">결제 직전 추천 화면에서 자기부담금 0원 보험(PF0)을 추천, 원래 PF70/PF30이던 고객에게만 노출 (정규화 전체 배포 후 실측)</div>
   </div>
-  <div class="updated">데이터 기준 (KST)<br>노출 5/21 14:00 ~ 6/15, 결제/수락 ~6/13 (결제 D+1~2 반영)</div>
+  <div class="updated">데이터 기준 (KST)<br>노출 5/21 14:00 ~ <span id="hdrCut">-</span>, 수락 결제 D+1~2 반영<br><span id="hdrGen" style="color:#d1d5db"></span></div>
 </div>
 
 <!-- ─── TIMELINE ─── -->
 <div class="timeline-bar">
   <div class="timeline-label">
     <span style="position:absolute;left:0;color:#2563eb;font-weight:700">정규화 배포 5/21 14:00</span>
-    <span style="position:absolute;right:0">현재 6/15</span>
+    <span style="position:absolute;right:0">현재 <span id="tlCut">-</span></span>
   </div>
   <div class="timeline-track"><div class="timeline-fill" style="left:0;width:100%"></div></div>
   <div class="timeline-legend">
@@ -137,27 +138,27 @@ pre.sql .cmt { color:#7dd3fc; }
   </div>
 
   <!-- ① KPI HERO -->
-  <div class="section-label" style="margin-top:18px">핵심 지표 <span class="tag tag-blue">정규화 후 누적 5/21 14:00 ~ 6/30</span> <span class="tag tag-ok">BQ 실측</span></div>
+  <div class="section-label" style="margin-top:18px">핵심 지표 <span class="tag tag-blue">정규화 후 누적 5/21 14:00 ~ <span id="kpiPeriodCut">-</span></span> <span class="tag tag-ok">BQ 실측</span></div>
   <div class="kpi-row">
     <div class="kpi-card">
       <div class="kpi-top">👥 노출 고객 수</div>
-      <div class="kpi-num">166,834<span class="kpi-unit">명</span></div>
+      <div class="kpi-num"><span id="kExpUU">-</span><span class="kpi-unit">명</span></div>
       <div class="kpi-sub">PF0 추천을 한 번 이상 본 고객 (중복 제거)<br>원래 PF70/PF30이던 고객</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-top">📲 노출 횟수</div>
-      <div class="kpi-num">323,416<span class="kpi-unit">회</span></div>
+      <div class="kpi-num"><span id="kExpCnt">-</span><span class="kpi-unit">회</span></div>
       <div class="kpi-sub">예약 시도(결제 직전)마다 1회 집계<br>일평균 약 8,000회</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-top">✅ PF0 수락(전환)</div>
-      <div class="kpi-num">18,044<span class="kpi-unit">건</span></div>
-      <div class="kpi-sub">노출 후 실제로 PF0로 결제한 건<br>전환 보험매출 합계 약 2.93억원 (최근 1~2일 결제 정산 중)</div>
+      <div class="kpi-num"><span id="kAcc">-</span><span class="kpi-unit">건</span></div>
+      <div class="kpi-sub">노출 후 실제로 PF0로 결제한 건<br>전환 보험매출 합계 약 <span id="kRev">-</span>억원 (최근 1~2일 결제 정산 중)</div>
     </div>
     <div class="kpi-card accent">
       <div class="kpi-top">🎯 수락률</div>
-      <div class="kpi-num">7.0<span class="kpi-unit">%</span></div>
-      <div class="kpi-sub">실제 예약까지 한 노출 고객 기준 PF0 전환율<br>노출 전체로 보면 5.8% (노출 고객의 17%는 그날 예약을 안 함)</div>
+      <div class="kpi-num"><span id="kRate">-</span><span class="kpi-unit">%</span></div>
+      <div class="kpi-sub">실제 예약까지 한 노출 고객 기준 PF0 전환율<br>노출 전체로 보면 <span id="kRateExp">-</span>% (노출 고객 일부는 그날 예약을 안 함)</div>
       <div class="kpi-pill">과거 실험(노출자 7% 전환)과 비슷한 수준</div>
     </div>
   </div>
@@ -165,12 +166,12 @@ pre.sql .cmt { color:#7dd3fc; }
   <!-- ② FUNNEL -->
   <div class="card">
     <h3>예약에서 수락까지 단계별 흐름</h3>
-    <div class="card-sub">정규화 배포 후 누적 (5/21 14:00 ~ 6/30), 전체 예약 기준</div>
+    <div class="card-sub">정규화 배포 후 누적 (5/21 14:00 ~ <span id="fnCut">-</span>), 전체 예약 기준</div>
     <div class="pipe-flow">
       <div class="pipe-step">
         <div class="pipe-box">
           <div class="pipe-lbl">① 예약</div>
-          <div class="pipe-num">422,994건</div>
+          <div class="pipe-num"><span id="fnRsv">-</span>건</div>
           <div class="pipe-sub2">정규화 후 전체 예약</div>
         </div>
       </div>
@@ -178,16 +179,16 @@ pre.sql .cmt { color:#7dd3fc; }
       <div class="pipe-step">
         <div class="pipe-box">
           <div class="pipe-lbl">② 노출</div>
-          <div class="pipe-num">323,416회</div>
-          <div class="pipe-sub2">PF0 추천이 뜬 예약, 전체의 76.5%<br>이미 PF0거나 다른 추천이 뜬 예약은 제외</div>
+          <div class="pipe-num"><span id="fnExp">-</span>회</div>
+          <div class="pipe-sub2">PF0 추천이 뜬 예약, 전체의 <span id="fnPct">-</span>%<br>이미 PF0거나 다른 추천이 뜬 예약은 제외</div>
         </div>
       </div>
       <div class="pipe-arrow">→</div>
       <div class="pipe-step result">
         <div class="pipe-box">
           <div class="pipe-lbl">③ 수락</div>
-          <div class="pipe-num">18,044건</div>
-          <div class="pipe-sub2">실제 PF0 전환<br>실제 예약자 기준 7.0% (노출 전체 기준 5.8%)<br>보험매출 약 2.93억원 (최근 1~2일 정산 중)</div>
+          <div class="pipe-num"><span id="fnAcc">-</span>건</div>
+          <div class="pipe-sub2">실제 PF0 전환<br>실제 예약자 기준 <span id="fnRateRsv">-</span>% (노출 전체 기준 <span id="fnRateExp">-</span>%)<br>보험매출 약 <span id="fnRev">-</span>억원 (최근 1~2일 정산 중)</div>
         </div>
       </div>
     </div>
@@ -200,7 +201,7 @@ pre.sql .cmt { color:#7dd3fc; }
       <ul style="margin:8px 0 0 18px;padding:0;line-height:1.75">
         <li>결제 직전 추천 화면에는 추천이 한 번에 한 종류만 표시됨.</li>
         <li>이미 PF0인 고객, 또는 시간연장과 차종 추천이 먼저 뜬 예약에는 PF0 추천이 안 뜸.</li>
-        <li>그래서 전체 예약의 76.5%에만 PF0 추천이 노출됨.</li>
+        <li>그래서 전체 예약의 <span id="notePct">-</span>%에만 PF0 추천이 노출됨.</li>
         <li>6/10 배포된 차종 추천이 뜨는 예약만큼 앞으로 PF0 추천 노출 비율은 더 낮아질 수 있음.</li>
       </ul>
     </details>
@@ -231,13 +232,13 @@ pre.sql .cmt { color:#7dd3fc; }
   <div class="section-label">PF0 생성 비중 <span class="tag tag-blue">사업 자료와 동일 기준</span> <span class="tag tag-gray">정규화 이후, 전체 예약</span></div>
   <div class="card">
     <h3>전체 예약 중 보험등급 선택 비율</h3>
-    <div class="card-sub">사업 자료의 PF0 지표와 같은 기준(전체 예약 중 PF0/30/70 결제 선택 비율). 위 수락률(7.0%, 노출 대비)과는 다른 축. 전체 422,994건 기준</div>
-    <div class="mrow"><span class="k">PF0 (자기부담금 0원)</span><span class="v">30.6%</span></div>
-    <div class="bar-track"><div class="bar-fill" style="width:30.6%;background:#16a34a"></div></div>
-    <div class="mrow" style="margin-top:10px"><span class="k">PF30 (자기부담금 30만원)</span><span class="v">24.0%</span></div>
-    <div class="bar-track"><div class="bar-fill" style="width:24.0%;background:#60a5fa"></div></div>
-    <div class="mrow" style="margin-top:10px"><span class="k">PF70 (자기부담금 70만원)</span><span class="v">44.9%</span></div>
-    <div class="bar-track"><div class="bar-fill" style="width:44.9%;background:#cbd5e1"></div></div>
+    <div class="card-sub">사업 자료의 PF0 지표와 같은 기준(전체 예약 중 PF0/30/70 결제 선택 비율). 위 수락률(노출 대비)과는 다른 축. 전체 <span id="ratioRsv">-</span>건 기준</div>
+    <div class="mrow"><span class="k">PF0 (자기부담금 0원)</span><span class="v"><span id="p0v">-</span>%</span></div>
+    <div class="bar-track"><div class="bar-fill" id="p0bar" style="width:0%;background:#16a34a"></div></div>
+    <div class="mrow" style="margin-top:10px"><span class="k">PF30 (자기부담금 30만원)</span><span class="v"><span id="p30v">-</span>%</span></div>
+    <div class="bar-track"><div class="bar-fill" id="p30bar" style="width:0%;background:#60a5fa"></div></div>
+    <div class="mrow" style="margin-top:10px"><span class="k">PF70 (자기부담금 70만원)</span><span class="v"><span id="p70v">-</span>%</span></div>
+    <div class="bar-track"><div class="bar-fill" id="p70bar" style="width:0%;background:#cbd5e1"></div></div>
     <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.7">
       전체 예약 PF0 선택 비율은 1~4월 23~24%에서 5~6월 30%로 상승.<br>
       결제 전 업셀링 UI 투입 후 7일(5/21~5/27) PF0 31%로, 사업 자료 "투입 후 31:25:44(+8%p)"와 일치.<br>
@@ -249,7 +250,7 @@ pre.sql .cmt { color:#7dd3fc; }
   <div class="section-label">일별 추이 <span class="tag tag-blue">노출 횟수 (막대)</span> <span class="tag tag-ok">수락률 (선)</span></div>
   <div class="card">
     <h3>PF 보험 넛지 일별 노출과 수락률</h3>
-    <div class="card-sub">5/21은 14:00 배포 후 반나절만 집계<br>노출은 6/30까지, 수락은 결제 정산 안정 구간인 6/28까지 (6/29~30 수락은 결제 D+1~2 반영으로 집계 중)</div>
+    <div class="card-sub">5/21은 14:00 배포 후 반나절만 집계<br>노출은 <span id="cExpCut">-</span>까지, 수락은 결제 정산 안정 구간인 <span id="cStableCut">-</span>까지 (최근 2일 수락은 결제 D+1~2 반영으로 집계 중)</div>
     <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
     <div class="chart-interpret">
       <span class="chart-interpret-icon">💡</span>
@@ -288,10 +289,10 @@ pre.sql .cmt { color:#7dd3fc; }
     <div class="card" style="margin-bottom:0">
       <h3>수락 1건의 가치</h3>
       <div class="card-sub">PF0 전환 시 발생하는 보험 매출 (전환 전 PF30/70 보험료 차감 전 총액)</div>
-      <div class="mrow"><span class="k">PF0 전환 보험매출 합계</span><span class="v">약 2.93억원</span></div>
-      <div class="mrow"><span class="k">전환 1건당 평균 보험매출</span><span class="v">약 16,250원</span></div>
-      <div class="mrow"><span class="k">참고: PF0 건당 평균 보험매출</span><span class="v">16,230원</span></div>
-      <div class="mrow"><span class="k">참고: PF30 건당 평균 보험매출</span><span class="v">4,995원</span></div>
+      <div class="mrow"><span class="k">PF0 전환 보험매출 합계</span><span class="v">약 <span id="vRev">-</span>억원</span></div>
+      <div class="mrow"><span class="k">전환 1건당 평균 보험매출</span><span class="v">약 <span id="vConvAvg">-</span>원</span></div>
+      <div class="mrow"><span class="k">참고: PF0 건당 평균 보험매출</span><span class="v"><span id="vAvg0">-</span>원</span></div>
+      <div class="mrow"><span class="k">참고: PF30 건당 평균 보험매출</span><span class="v"><span id="vAvg30">-</span>원</span></div>
       <div style="font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.6">순증분(전환 전 대비 추가 매출)은 위 총액보다 작음.<br>대조군이 없는 정규화 단계라 순증분 추정은 별도 분석 필요.</div>
     </div>
   </div>
@@ -310,18 +311,18 @@ pre.sql .cmt { color:#7dd3fc; }
       </div>
       <div style="font-size:12px;color:#4b5563;line-height:1.7">
         6/10 오전 프로덕션 배포, 노출 시작.<br>
-        6/10~6/15 노출 일 평균 약 120명, 차종 업그레이드를 고른 사람 일 평균 약 42명(노출 대비 약 35%).<br>
-        당일출발 등 조건이 좁아 모수는 작음. 수락(차종 결제 전환)은 결제 데이터 정리 후 추가 예정.
+        차종 업그레이드 상세 실적은 <a href="https://socar-roina.github.io/upselling-dashboard-car-upgrade/" target="_blank" style="color:#2563eb">차종 대시보드</a>에서 확인.<br>
+        당일출발 등 조건이 좁아 모수는 작음.
       </div>
     </div>
     <div class="status-card">
       <div class="status-head">
-        <span class="status-badge status-pending">실험 종료, 정규화 대기</span>
+        <span class="status-badge status-live">조건 완화 PoC (6/25)</span>
         <strong style="font-size:13px;color:#111827">대여요금 (시간연장)</strong>
       </div>
       <div style="font-size:12px;color:#4b5563;line-height:1.7">
-        시간연장 ABT는 5/13~6/2 운영 후 종료, 6/3부터 프로덕션 노출 없음.<br>
-        실험 기간 노출은 소량(일 view 30~130건, 연장 선택 클릭 14~50건), 당일출발과 길이 조건이 좁아 모수 작음.
+        시간연장 ABT는 5/13~6/2 운영 후 종료, 6/25부터 리드타임 조건을 완화해 PoC로 재노출 중(대조군 없음).<br>
+        상세는 <a href="https://socar-roina.github.io/upselling-dashboard-interval-extension/poc-monitoring.html" target="_blank" style="color:#2563eb">시간연장 PoC 대시보드</a> 참고.
       </div>
     </div>
   </div>
@@ -331,25 +332,24 @@ pre.sql .cmt { color:#7dd3fc; }
   <summary class="method-summary">집계 기준, 데이터 출처, 쿼리</summary>
   <div class="method">
     <h3>정의</h3>
-    <div class="method-item">• <strong>예약</strong>: 정규화 후 전체 생성 예약 건수 (<code>profit_socar_reservation</code>, <code>created_at_kst</code> 2026-05-21 14:00 ~ 6/13). 240,634건 = 퍼널 모수.</div>
+    <div class="method-item">• <strong>예약</strong>: 정규화 후 전체 생성 예약 건수 (<code>profit_socar_reservation</code>, <code>created_at_kst</code> 2026-05-21 14:00 이후) = 퍼널 모수.</div>
     <div class="method-item">• <strong>노출 고객 / 노출 횟수</strong>: 앱 이벤트 로그에서 <code>page_name='upsell_bottomsheet'</code>, <code>event_name='view'</code>, PF 넛지(<code>upselling_type=pfNudge</code> 또는 단축 <code>ut=p</code>) 이벤트. 고객 수 = 고유 <code>member_id</code>, 노출 횟수 = (날짜 × 고객) 단위.</div>
     <div class="method-item">• <strong>수락(PF0 전환)</strong>: 노출 고객이 같은 날 실제로 PF0(<code>pf_type='0'</code>) 예약을 생성한 경우. 단순 클릭이 아니라 결제 결과 기준.</div>
-    <div class="method-item">• <strong>수락률</strong> = 수락(전환) ÷ 노출 횟수 = 5.8%. 노출 고객 중 그날 실제 예약 완료(152,510건, 83%)만 분모로 보면 <strong>7.0%</strong>(실제 예약자 기준). 노출 전체 중 17%는 추천만 보고 미예약이라 수락 기회 없음.</div>
-    <div class="method-item">• <strong>직접/간접</strong>: 수락 건 중 추천 화면 결제하기(<code>cta_button</code>) 클릭 후 PF0 결제면 직접(9,946건, 92.6%), cta 클릭 없이 결제 페이지에서 PF0 선택이면 간접(797건, 7.4%).</div>
-    <div class="method-item">• <strong>노출 대상</strong>: 추천은 예약 1건당 한 종류만 노출. 이미 PF0거나 시간연장/차종 추천이 먼저 뜬 예약은 PF0 노출에서 제외(전체 예약의 76.5%만 PF0 추천 노출).</div>
-    <div class="method-item">• <strong>참고</strong>: 전체 예약 중 PF0 선택 비율은 30.2%(이미 PF0인 고객 포함)로, 위 수락률(넛지가 PF70/30을 PF0로 전환한 비율)과 다른 지표.</div>
+    <div class="method-item">• <strong>수락률</strong> = 수락(전환) ÷ 노출 횟수 (노출 대비). 노출 고객 중 그날 실제 예약 완료만 분모로 보면 예약자 기준 수락률(더 높음). 노출 일부는 추천만 보고 미예약이라 수락 기회 없음.</div>
+    <div class="method-item">• <strong>직접/간접</strong>: 수락 건 중 추천 화면 결제하기(<code>cta_button</code>) 클릭 후 PF0 결제면 직접(92.6%), cta 클릭 없이 결제 페이지에서 PF0 선택이면 간접(7.4%). (건수는 정규화 초기 5/21~6/13 기준)</div>
+    <div class="method-item">• <strong>노출 대상</strong>: 추천은 예약 1건당 한 종류만 노출. 이미 PF0거나 시간연장/차종 추천이 먼저 뜬 예약은 PF0 노출에서 제외.</div>
 
     <h3 style="margin-top:16px">데이터 출처 (BigQuery)</h3>
     <div class="method-item">• 이벤트(노출, 클릭): <code>socar-data.app_web_log.socar_app_web_log</code> (Firebase에서 BQ로 적재, 약 D+1 반영)</div>
-    <div class="method-item">• 결제와 예약(PF0 전환, 보험매출): <code>socar-data.socar_biz_profit.profit_socar_reservation</code> (<code>pf_type</code>, <code>_rev_pf</code>, <code>created_at_kst</code>). 결제 데이터는 D+1~2 반영이라 누적 수치는 6/13까지로 집계.</div>
+    <div class="method-item">• 결제와 예약(PF0 전환, 보험매출): <code>socar-data.socar_biz_profit.profit_socar_reservation</code> (<code>pf_type</code>, <code>_rev_pf</code>, <code>created_at_kst</code>). 결제 데이터는 D+1~2 반영이라 최근 1~2일 수락은 정산 중.</div>
     <div class="method-item">• <strong>form_data 포맷 변경</strong>: 6/10 차종 배포 때 단축됨. 이전 <code>{pf_original:70,upselling_type:pfNudge}</code>, 이후 <code>{pf:70,ut:p}</code> (pfNudge=p, carUpgradeUpselling=c). 정상 JSON이 아니라 REGEXP로 두 포맷 모두 추출.</div>
 
     <h3 style="margin-top:16px">정규화 배포 시점 확인</h3>
     <div class="method-item">• BQ 시간대별 집계상 5/21 13시 view 3건에서 <strong>14시 306건, 16시 977건</strong>으로 급증. 전체 100% 노출 전환 확인. 기준 시점 <strong>2026-05-21 14:00 KST</strong>.</div>
 
-    <h3 style="margin-top:16px">주의</h3>
-    <div class="method-item">• <strong>최근 2일(6/14~15)</strong>: 결제 데이터 D+1~2 반영으로 수락이 아직 과소집계. 노출(이벤트)은 6/15까지 완전.</div>
-    <div class="method-item">• <strong>차종 수치</strong>: 노출/선택은 이벤트 로그 기준(6/10~6/15). 차종 결제 전환은 별도 집계 예정.</div>
+    <h3 style="margin-top:16px">자동 갱신</h3>
+    <div class="method-item">• 매일 오전/오후 <code>scripts/gen_data.py</code>가 BQ를 재집계해 <code>data.js</code>로 출력, 화면 수치와 차트가 자동 갱신됨. 사람이 숫자를 손으로 고치지 않음.</div>
+    <div class="method-item">• <strong>노출(이벤트)</strong>은 어제까지 완전, <strong>수락(결제)</strong>은 D+1~2 정산이라 최근 2일은 일별 차트에서 비움(총계에는 포함).</div>
 
     <pre class="sql"><span class="cmt">-- 일별 노출 / PF0 수락 (정규화 배포 후, 구버전/신버전 form_data 통합)</span>
 WITH v AS (
@@ -359,7 +359,6 @@ WITH v AS (
     AND (REGEXP_EXTRACT(form_data, r'upselling_type[\\:]+([A-Za-z]+)')='pfNudge'
          OR REGEXP_EXTRACT(form_data, r'ut[\\:]+([a-z])')='p')   <span class="cmt">-- pfNudge (신포맷 ut=p)</span>
     AND event_at_kst >= DATETIME '2026-05-21 14:00:00'
-    AND event_at_kst <  DATETIME '2026-06-14 00:00:00'           <span class="cmt">-- 결제 안정 구간 6/13까지</span>
     AND member_id IS NOT NULL
 ),
 r AS (
@@ -367,7 +366,6 @@ r AS (
   FROM `socar-data.socar_biz_profit.profit_socar_reservation`
   WHERE pf_type='0'
     AND created_at_kst >= DATETIME '2026-05-21 14:00:00'
-    AND created_at_kst <  DATETIME '2026-06-14 00:00:00'
 )
 SELECT v.d,
   COUNT(DISTINCT v.member_id) AS exposed_uu,
@@ -380,50 +378,85 @@ GROUP BY 1 ORDER BY 1;</pre>
 </div>
 
 <script>
-// ─── DAILY DATA (BQ 실측) ───
-// 노출: 5/21~6/15 완전 / 수락: 6/13까지 안정, 6/14~15는 결제 D+1~2로 집계 중이라 null
-const labels   = ['5/21','5/22','5/23','5/24','5/25','5/26','5/27','5/28','5/29','5/30','5/31','6/1','6/2','6/3','6/4','6/5','6/6','6/7','6/8','6/9','6/10','6/11','6/12','6/13','6/14','6/15','6/16','6/17','6/18','6/19','6/20','6/21','6/22','6/23','6/24','6/25','6/26','6/27','6/28','6/29','6/30'];
-const exposed  = [5071,7458,6447,5870,7738,8092,7859,8281,7499,7284,7965,8797,7860,8771,8389,7898,7213,7267,8269,7966,8515,8566,7454,7239,7913,8755,8623,8369,8521,7590,7366,8431,8440,8121,8084,8633,8063,7336,8118,8779,8506];
-const accepted = [295,548,546,481,527,484,483,512,559,509,443,484,549,503,433,496,455,383,452,420,453,422,487,448,383,453,483,377,401,477,457,434,393,357,336,390,417,406,320,null,null];
-const rate = labels.map((_, i) =>
-  (exposed[i] && accepted[i] != null) ? +((accepted[i] / exposed[i] * 100).toFixed(1)) : null
-);
+// ─── 데이터 연동 (window.PF = data.js, BQ 자동 집계) ───
+(function(){
+  var P = window.PF;
+  var colBlue = '#3b82f6', colGreen = '#16a34a';
+  if (!P) { console.error('data.js 로드 실패'); return; }
+  var f = function(n){ return (n==null? '-' : Number(n).toLocaleString()); };
+  var set = function(id, val){ var el=document.getElementById(id); if(el) el.textContent=val; };
 
-const colBlue = '#3b82f6', colGreen = '#16a34a';
+  set('hdrCut', P.meta.cut);
+  set('hdrGen', '갱신 ' + P.meta.generated);
+  set('tlCut', P.meta.cut);
+  set('kpiPeriodCut', P.meta.cut);
+  set('fnCut', P.meta.cut);
+  set('cExpCut', P.meta.cut);
+  set('cStableCut', P.stableCut);
 
-new Chart(document.getElementById('trendChart'), {
-  data: {
-    labels,
-    datasets: [
+  set('kExpUU', f(P.exposedUU));
+  set('kExpCnt', f(P.exposedCnt));
+  set('kAcc', f(P.acceptedPf0));
+  set('kRev', P.revenueEok);
+  set('kRate', P.rateRsv);
+  set('kRateExp', P.rateExp);
+
+  set('fnRsv', f(P.rsvTotal));
+  set('fnExp', f(P.exposedCnt));
+  set('fnPct', P.exposePct);
+  set('fnAcc', f(P.acceptedPf0));
+  set('fnRateRsv', P.rateRsv);
+  set('fnRateExp', P.rateExp);
+  set('fnRev', P.revenueEok);
+  set('notePct', P.exposePct);
+
+  set('ratioRsv', f(P.rsvTotal));
+  set('p0v', P.pfRatio.p0); set('p30v', P.pfRatio.p30); set('p70v', P.pfRatio.p70);
+  var w = function(id, pct){ var el=document.getElementById(id); if(el) el.style.width=pct+'%'; };
+  w('p0bar', P.pfRatio.p0); w('p30bar', P.pfRatio.p30); w('p70bar', P.pfRatio.p70);
+
+  set('vRev', P.revenueEok);
+  set('vConvAvg', f(P.convAvg));
+  set('vAvg0', f(P.avgPf0));
+  set('vAvg30', f(P.avgPf30));
+
+  // ─── 차트 ───
+  var labels = P.daily.labels, exposed = P.daily.exposed, accepted = P.daily.accepted;
+  var rate = labels.map(function(_, i){
+    return (exposed[i] && accepted[i] != null) ? +((accepted[i] / exposed[i] * 100).toFixed(1)) : null;
+  });
+
+  new Chart(document.getElementById('trendChart'), {
+    data: { labels: labels, datasets: [
       { type:'bar', label:'노출 횟수', data: exposed, backgroundColor:'rgba(59,130,246,0.20)', borderColor:colBlue, borderWidth:1, yAxisID:'y', borderRadius:4, order:2 },
       { type:'line', label:'수락률 (%)', data: rate, borderColor:colGreen, backgroundColor:'rgba(22,163,74,0.08)', pointBackgroundColor:colGreen, pointRadius:4, borderWidth:2.5, tension:0.35, yAxisID:'y1', order:1, spanGaps:false }
-    ]
-  },
-  options: {
-    responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{ labels:{ font:{size:11}, boxWidth:12, padding:12 } } },
-    scales:{
-      x:{ ticks:{font:{size:11}}, grid:{display:false} },
-      y:{ position:'left', beginAtZero:true, suggestedMax:10000, title:{display:true,text:'노출 횟수',font:{size:10},color:'#9ca3af'}, ticks:{font:{size:11}, callback:v=>v.toLocaleString()}, grid:{color:'#f3f4f6'} },
-      y1:{ position:'right', beginAtZero:true, suggestedMax:12, title:{display:true,text:'수락률 %',font:{size:10},color:'#16a34a'}, ticks:{font:{size:11}, callback:v=>v+'%'}, grid:{drawOnChartArea:false} }
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ font:{size:11}, boxWidth:12, padding:12 } } },
+      scales:{
+        x:{ ticks:{font:{size:11}}, grid:{display:false} },
+        y:{ position:'left', beginAtZero:true, suggestedMax:10000, title:{display:true,text:'노출 횟수',font:{size:10},color:'#9ca3af'}, ticks:{font:{size:11}, callback:function(v){return v.toLocaleString();}}, grid:{color:'#f3f4f6'} },
+        y1:{ position:'right', beginAtZero:true, suggestedMax:12, title:{display:true,text:'수락률 %',font:{size:10},color:'#16a34a'}, ticks:{font:{size:11}, callback:function(v){return v+'%';}}, grid:{drawOnChartArea:false} }
+      }
     }
-  }
-});
+  });
 
-new Chart(document.getElementById('acceptChart'), {
-  type:'bar',
-  data:{ labels, datasets:[
-    { label:'PF0 수락 건수', data: accepted, backgroundColor:'rgba(22,163,74,0.75)', borderColor:colGreen, borderWidth:0, borderRadius:4 }
-  ]},
-  options:{
-    responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{ labels:{ font:{size:11}, boxWidth:12, padding:10 } } },
-    scales:{
-      x:{ ticks:{font:{size:11}}, grid:{display:false} },
-      y:{ beginAtZero:true, ticks:{font:{size:11}}, grid:{color:'#f3f4f6'} }
+  new Chart(document.getElementById('acceptChart'), {
+    type:'bar',
+    data:{ labels: labels, datasets:[
+      { label:'PF0 수락 건수', data: accepted, backgroundColor:'rgba(22,163,74,0.75)', borderColor:colGreen, borderWidth:0, borderRadius:4 }
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ font:{size:11}, boxWidth:12, padding:10 } } },
+      scales:{
+        x:{ ticks:{font:{size:11}}, grid:{display:false} },
+        y:{ beginAtZero:true, ticks:{font:{size:11}}, grid:{color:'#f3f4f6'} }
+      }
     }
-  }
-});
+  });
+})();
 </script>
 </body>
 </html>
