@@ -63,6 +63,15 @@ SELECT FORMAT_DATE('%Y-%m-%d', v.d) dt,
 FROM v LEFT JOIN r ON v.d=r.d AND v.member_id=r.member_id
 GROUP BY 1 ORDER BY 1""")
 
+    # 이벤트 로그 D+1 지연: 노출이 아직 안 실린 마지막 날(들)은 기준일에서 제외.
+    # (예약(profit)은 먼저 실려서, 그 날을 넣으면 노출비율이 가짜로 하락함)
+    if not a.cut:
+        loaded = [r["dt"] for r in daily if int(num(r.get("exposed"))) > 0]
+        if loaded and max(loaded) < cut:
+            cut = max(loaded)
+            end = (datetime.strptime(cut, "%Y-%m-%d").date() + timedelta(days=1)).strftime("%Y-%m-%d") + " 00:00:00"
+            sys.stderr.write(f"[guard] 노출 미적재로 기준일 {cut}로 조정\n")
+
     # 2) 노출 고객 수(전 기간 고유), 전환 보험매출 합계/평균
     tot = bq(f"""
 WITH v AS (
